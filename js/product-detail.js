@@ -7,4 +7,5 @@ $(document).ready(function(){
         thumbContainerClass: 'owl-thumbs',
         thumbItemClass: 'owl-thumb-item'
     });
+
 });

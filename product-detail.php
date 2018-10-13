@@ -1,12 +1,67 @@
 <?php
 session_start();
+
+include_once('includes/config.php');
+$url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$product_name_url = substr($url, strpos($url, '?') + 1);
+
+if (!empty($product_name_url)) {
+    
+    $getProduct = $db_conn -> prepare("SELECT * FROM products WHERE product_url = '$product_name_url'");
+    $getProduct -> execute();
+    $product = $getProduct -> fetch(PDO::FETCH_ASSOC);
+
+    $product_id_next = $product['product_id'] + 1;
+    $product_id_prev = $product['product_id'] - 1;
+
+    $nextProduct = $db_conn -> prepare("SELECT product_url FROM products WHERE product_id = '$product_id_next'");
+    $nextProduct -> execute();
+    $next_product = $nextProduct -> fetch();
+
+    $prevProduct = $db_conn -> prepare("SELECT product_url FROM products WHERE product_id = '$product_id_prev'");
+    $prevProduct -> execute();
+    $prev_product = $prevProduct -> fetch();
+
+    $rows = $getProduct -> rowCount();
+    if ($rows > 0) {
+        # Product exists
+    } else {
+        header("Location: index.php");
+    }
+} else {
+    header("Location: index.php");
+}
+
+#Auth Section
+if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
+
+    #Store retrieved session values
+    $email = $_SESSION['email'];
+    $token = $_SESSION['token'];
+
+    # if email and token is set check them against the database, retrieve and store the email and token retrieved for comparison
+
+    $sql = "SELECT user_email, user_token from users WHERE user_email = '$email'";
+    $retrieveStmt = $db_conn -> prepare($sql);
+    $retrieveStmt -> execute();
+
+    $user_row = $retrieveStmt -> fetch(PDO::FETCH_ASSOC);
+
+    if ($user_row > 0) {
+        # store values to be compared
+        $_server_email = $user_row['user_email'];
+        $_server_token = $user_row['user_token'];
+    }
+
+}
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>MSwiss | Product Detail</title>
+    <title>MSwiss | <?php echo $product['product_name'] ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Main CSS-->
@@ -101,15 +156,16 @@ session_start();
                     </div>
                 </div>
                 <div class="menu-login-signup">
-                    <?php
-                        if (isset($_SESSION['user_logged'])) {
-                            if ($_SESSION['user_logged'] == "true") {
-                                echo '<a href="includes/logout.php" class="user-logout">Logout</a>';
-                            }
-                        }else {
-                            echo '<a href="#" class="login">Login</a>
-                            <a href="#" class="signup">Signup</a>';
+                <?php
+                    if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
+                        if ($email == $_server_email && $token == $_server_token)
+                        {
+                            echo '<a href="includes/logout.php" class="user-logout">Logout</a>';
                         }
+                    } else {
+                        echo '<a href="#" class="login">Login</a>
+                        <a href="#" class="signup">Signup</a>';
+                    }
                     ?>
                 </div>
                 <div class="menu-cart">
@@ -124,31 +180,56 @@ session_start();
         <div class="product-container">
             <div class="owl-carousel">
                 <div class="product-image item">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
+                    <img src="<?php echo $product['product_image_1']; ?>" alt="Product 1" />
                 </div>
                 <div class="product-image item">
-                    <img src="images/product_images/product2.png" alt="Product 1" />
+                    <img src="<?php echo $product['product_image_2']; ?>" alt="Product 1" />
                 </div>
                 <div class="product-image item">
-                    <img src="images/product_images/product3.png" alt="Product 1" />
+                    <img src="<?php echo $product['product_image_3']; ?>" alt="Product 1" />
                 </div>
             </div>
 
             <div class="product-title">
-                <h4>Nike VaporMax</h4>
-                <p>$200</p>
+                <h4><?php echo $product['product_name']; ?></h4>
+                <p>$<?php echo $product['product_price']; ?></p>
             </div>
 
             <div class="product-description">
                 <div class="product-description-wrapper">
-                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Harum qui adipisci a quae? Quibusdam at est laudantium voluptas quasi. Architecto eos laudantium quidem impedit tempora illum. Nemo iusto magnam dolore.</p>
-                    <button class="product-detail-add-to-cart"><span>+</span>Add to cart</button>
+                    <p><?php echo $product['product_description']; ?></p>
+                    <?php
+                    if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
+                        if ($email == $_server_email && $token == $_server_token)
+                        {
+                            echo '
+                            <a class="add-to-cart"><span></span></a>
+                            ';
+                        } else {
+                            echo '<button class="product-detail-add-to-cart"><span>+</span>Add to cart</button>';
+                        }          
+                    } else {
+                        echo '<button class="product-detail-add-to-cart"><span>+</span>Add to cart</button>';
+                    }
+                    ?>
                 </div>
             </div>
 
             <div class="product-switch">
-                <img class="previous-button" src="images/icons/icon_previous.png" alt="Previous Product">
-                <img class="next-button" src="images/icons/icon_next.png" alt="Next Product">
+                <?php
+                    if ($prev_product > 0) {
+                        echo '<a href="product-detail.php?' . $prev_product['product_url'] . '">
+                        <img class="previous-button" src="images/icons/icon_previous.png" alt="Previous Product">
+                        </a>';
+                    }
+
+                    if ($next_product > 0) {
+                        echo '<a href="product-detail.php?' . $next_product['product_url'] . '">
+                        <img class="next-button" src="images/icons/icon_next.png" alt="Next Product">
+                        </a>';
+                    }
+                ?>
+                
             </div>
 
             <div class="clearfix"></div>

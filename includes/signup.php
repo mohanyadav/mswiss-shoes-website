@@ -31,17 +31,39 @@
     } elseif ($user_row_email['user_email'] == $email) {
         echo "You are already a registered user!";
     } else {
-        $insertStmt = $db_conn->prepare("INSERT INTO users (user_name, user_email, user_password, user_address, user_type) VALUES (:name, :email, :password, :address, :type);");
+        # Generate a unique token
+        $token = $email + $password + time();
+        $token = password_hash($token, PASSWORD_BCRYPT);
+
+        $insertStmt = $db_conn->prepare("INSERT INTO users (user_name, user_email, user_password, user_address, user_type, user_token) VALUES (:name, :email, :password, :address, :type, :token);");
         
         $insertStmt->bindParam(':name', $name);
         $insertStmt->bindParam(':email', $email);
         $insertStmt->bindParam(':password', $hashed_password);
         $insertStmt->bindParam(':address', $address);
         $insertStmt->bindParam(':type', $type);
+        $insertStmt->bindParam(':token', $token);
         $insertStmt->execute();
 
+        $arr = explode("@", $email, 2); 
+        $cartName = $arr[0] . '_cart';
+
+        $createTableSql = "CREATE TABLE $cartName (
+        cart_id INT(40) AUTO_INCREMENT PRIMARY KEY,
+        product_id INT(40) NOT NULL,
+        product_name VARCHAR(60) NOT NULL,
+        product_price FLOAT(50) NOT NULL,
+        product_image VARCHAR(255) NOT NULL,
+        product_quantity INT(20) NOT NULL
+        );";
+
+        $db_conn -> exec($createTableSql);
+
         echo "products.php";
-        $_SESSION['user_logged'] = "true";
+        
+        $_SESSION['email'] = $email;
+        $_SESSION['token'] = $token;
+
         exit();
     }
 

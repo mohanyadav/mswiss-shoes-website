@@ -114,12 +114,6 @@ nav {
     transition: all 0.3s;
 }
 
-.product-detail-add-to-cart.added {
-    color: #000000;
-    border: 2px solid #000000;
-    background: transparent;
-}
-
 /* Carousel Styles */
 owl-carousel .owl-item img {
     transform-style: initial;
@@ -179,7 +173,6 @@ owl-carousel .owl-item img {
     height: 40px;
     right: 20px;
     top: 90px;
-    cursor: pointer;
 }
 
 .previous-button,
@@ -196,5 +189,79 @@ owl-carousel .owl-item img {
 .previous-button:hover,
 .next-button:hover {
     border: 1px solid #000000;
+    transition: all 0.3s;
+}
+
+.add-to-cart::after {
+ content: 'Add to cart';
+}
+
+.add-to-cart  {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 50px;
+    background: #000000;
+    color: #ffffff;
+    border: none;
+    outline: none;
+    font-family: 'bebas', sans-serif;
+    font-weight: lighter;
+    font-size: 16px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.added::after {
+ content: 'Added';
+}
+
+.added {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 50px;
+    outline: none;
+    font-family: 'bebas', sans-serif;
+    font-weight: lighter;
+    font-size: 16px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    color: #000000;
+    border: 2px solid #000000;
+    background: #ffffff;
+    transition: all 0.3s;
+}
+
+.add-to-cart span{
+    font-family: 'bebas', sans-serif;
+    color: #ffffff;
+    margin-right: 0px;
+    opacity: 0;
+    font-size: 0px;
+    transition: all 0.3s;
+}
+
+.added span {
+    color: #000000;
+}
+
+.add-to-cart span::after {
+    content: '+';
+}
+
+.added span::after {
+    content: '-';
+}
+
+.add-to-cart:hover span {
+    font-size: 30px;
+    margin-right: 20px;
+    opacity: 1;
     transition: all 0.3s;
 }

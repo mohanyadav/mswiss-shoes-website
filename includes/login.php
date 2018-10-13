@@ -7,7 +7,7 @@
     $password = $_POST['password'];
 
     $type = "user";
-
+    
     $stmtEmail = $db_conn->prepare("SELECT * FROM users where user_email = :user_email");
     $stmtEmail->bindParam(':user_email', $email);
     $stmtEmail->execute();
@@ -24,7 +24,16 @@
         echo "Please enter password!";
     } elseif ($user_row['user_email'] == $email && $password_verified) {
         echo "products.php";
-        $_SESSION['user_logged'] = "true";
+        $token = $email + $password + time();
+        $token = password_hash($token, PASSWORD_BCRYPT);
+
+        $sql = "UPDATE users SET user_token = '$token' WHERE user_email = '$email'";
+        $updateStmt = $db_conn -> prepare($sql);
+        $updateStmt -> execute();
+
+        $_SESSION['email'] = $email;
+        $_SESSION['token'] = $token;
+        
         exit();
         
     } elseif (!$user_row['user_email'] == $email || !$password_verified) {

@@ -50,6 +50,34 @@ $(document).ready(function(){
         body.css('overflow-y', 'hidden');
     });
 
+    $('.product-detail-add-to-cart').click(function(e){
+        e.preventDefault();
+        overlay.addClass('active');
+        loginDialog.addClass('active');
+        body.css('overflow-y', 'hidden');
+    });
+
+    $count = $('.cart-count p').text();
+
+    $('.add-to-cart').click(function(e){
+        e.preventDefault();
+        $('.add-to-cart').toggleClass('added');
+        if ($('.add-to-cart').hasClass('added')) {
+            $count++;
+            $('.cart-count p').text($count);
+
+            // Add product to database cart
+            
+        } else {
+            $count--;
+            $('.cart-count p').text($count);
+
+            //Remove product from database cart
+        }
+
+        
+    });
+
     navSignupBtn.click(function(e){
         e.preventDefault();
         overlay.addClass('active');
