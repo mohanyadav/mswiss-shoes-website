@@ -98,8 +98,24 @@ $(document).ready(function(){
             
         e.preventDefault();
         }
-
         
+    });
+
+    $(".remove_product").click(function(e){
+        e.preventDefault();
+        var productName = $(this).attr('alt');
+        
+        var data = "product_name=" + productName;
+
+        $.ajax({
+            type: "POST",
+            url: "includes/remove-from-cart.php",
+            data: data,
+            success: function(data)
+            {       
+                window.location.reload();                
+            }
+        });
     });
 
     navSignupBtn.click(function(e){

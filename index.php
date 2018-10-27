@@ -66,6 +66,11 @@ if (isset($_SESSION['email'])) {
                 </a>
             </li>
             <li>
+                <a href="cart.php">
+                    Cart
+                </a>
+            </li>
+            <li>
                 <a href="index.php">
                     About
                 </a>

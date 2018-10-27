@@ -4,10 +4,6 @@ session_start();
 
 include_once('includes/config.php');
 
-$getProducts = $db_conn -> prepare("SELECT * FROM products");
-$getProducts -> execute();
-
-$products = $getProducts -> fetchAll();
 
 #Auth Section
 if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
@@ -35,7 +31,13 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
 if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
     if ($email == $_server_email && $token == $_server_token)
     {
+        $arr = explode("@", $_SESSION['email'], 2); 
+        $cartName = $arr[0] . '_cart';
 
+        $getCartProducts = $db_conn -> prepare("SELECT * FROM $cartName");
+        $getCartProducts -> execute();
+
+        $cartProducts = $getCartProducts -> fetchAll();
     }
 } else {
     header('Location: index.php');
@@ -55,6 +57,23 @@ if (isset($_SESSION['email'])) {
     $totalCartProducts = $allUserCartProductss -> rowCount();
 }
 
+
+#Total Price of Products
+$totalPriceProducts = $db_conn -> prepare("SELECT SUM(product_price) FROM $cartName");
+
+$totalPriceProducts -> execute();
+
+$totalPriceRow = $totalPriceProducts -> fetch(PDO::FETCH_NUM);
+
+$totalPrice = $totalPriceRow[0];
+
+
+# Get all products added to cart
+$allCartProducts = $db_conn -> prepare("SELECT * FROM $cartName");
+$allCartProducts -> execute();
+
+$allCartProductsRow = $allCartProducts -> fetchAll();
+
 ?>
 
 <!DOCTYPE html>
@@ -71,6 +90,9 @@ if (isset($_SESSION['email'])) {
     <!-- Products CSS -->
     <link rel="stylesheet" type="text/css" media="screen" href="css/products.css" />
 
+    <!-- Roboto font CDN -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
+
 </head>
 <body>
 
@@ -82,8 +104,13 @@ if (isset($_SESSION['email'])) {
                 </a>
             </li>
             <li>
-                <a href="products.php" class="active-link">
+                <a href="products.php">
                     Shop
+                </a>
+            </li>
+            <li>
+                <a href="cart.php" class="active-link">
+                    Cart
                 </a>
             </li>
             <li>
@@ -169,87 +196,83 @@ if (isset($_SESSION['email'])) {
         </nav>
 
         <div class="products-container">
-            <?php 
-                $rows = $getProducts -> rowCount();
-                    // $count = 0;
-                    if ($rows > 0) {
-                        for ($i=0; $i < $rows; $i++) {
-                            // if ($i % 3 == 2 || $i == 0) {
-                            //     echo '<div class="products-row">';
-                            //     $count = $i;
-                            //     // echo 'i starting ' . $i . '<br>';
-                            // }
-                            
-                            // $product_url = strtolower(Str_replace(' ', '-', $products[$i]['product_name']));
-                            
+            <div class="cart-wrapper">
+                <h2>Cart <?php echo '(' . $totalCartProducts . ')'; ?></h2>
+                <div class="cart-products">
+                    <?php
+                        $cartProductsCount = $allCartProducts ->  rowCount();
+                        
+                        for ($i=0; $i < $cartProductsCount; $i++) { 
+                            # Print the products
                             echo '
-                            <a href="product-detail.php?' . $products[$i]['product_url'] . '" class="product-card">
-                                <img src="' . $products[$i]['product_image_1'] . '" alt="'. $products[$i]['product_name'] . '" />
-                                <div class="product-title">
-                                    <h4>' . $products[$i]['product_name'] . '</h4>
-                                    <p>$' . $products[$i]['product_price'] . '</p>
+                            <div class="product">
+                                <div class="product-image-wrapper">
+                                    <img src="' . $allCartProductsRow[$i]['product_image'] . '" alt="' . $allCartProductsRow[$i]['product_name'] . '">
                                 </div>
-                            </a>';
-    
-                            // if ($i % 3 == 1 && $i != 0) {
-                            //     // echo 'i ending ' . $i . '<br>';
-                            //     echo '</div>
-                            //     <div class="clearfix"></div>';
-                            // }
+                                <div class="product-content-wrapper">
+                                    <div class="content">
+                                        <h4>' . $allCartProductsRow[$i]['product_name'] . '</h4>
+                                        <p>$' . $allCartProductsRow[$i]['product_price'] . '</p>
+                                        <img src="images/icons/icon_close.png" alt="' . $allCartProductsRow[$i]['product_name'] . '" class="remove_product">
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            ';
                         }
+                    ?>
+                </div>
+            </div>
+            <div class="checkout-wrapper">
+                <p>Total Items: <span><?php echo $totalCartProducts; ?></span></p>
+                <p>Products Price: 
+                    <span>
+                        <?php 
+                            $totalPrice = number_format($totalPrice, 2, '.', ' ');
+                            echo '$'.$totalPrice;
+                        ?>
+                    </span>
+                </p>
+                <p>GST (18%): 
+                    <span>
+                    <?php 
+                        $gst = $totalPrice * 18 / 100;
+                        $gst = number_format($gst, 2, '.', ' ');
+                        echo '$'.$gst; 
+                    ?>
+                    </span>
+                </p>
+                <p>Rounded Price: 
+                    <span>
+                    <?php 
+                        $priceDiff = $totalPrice + $gst - round($totalPrice + $gst);
+
+                        $priceDiff = number_format($priceDiff, 2, '.', ' ');
+                        echo '$'.$priceDiff; 
+                    ?>
+                    </span>
+                </p>
+                <div class="spacer"></div>
+                <p>Total Price: </p>
+                <p class="total-price">
+                    <span>
+                        <?php 
+                            $totalPriceAfterGST = $totalPrice + $gst - $priceDiff;
+
+                            $totalPriceAfterGST = number_format($totalPriceAfterGST, 2, '.', ' ');
+                            echo '<sup>$ </sup>'.$totalPriceAfterGST; 
+                        ?>
+                    </span>
+                </p>
+                <?php
+                    if ($totalCartProducts > 0) {
+                        # Show Checkout button only if user cart has product
+                        echo '
+                            <a href="#" class="checkout-button">Checkout</a>
+                        ';
                     }
-    
-            ?>
-            <!-- <div class="products-row">
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
+                ?>
             </div>
-
-            <div class="clearfix"></div>
-            <div class="products-row">
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-            </div>
-            <div class="clearfix"></div> -->
-
         </div>
     </div>
 
