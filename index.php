@@ -27,6 +27,19 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
 
 }
 
+$totalCartProducts = 0;
+
+# Get the total number of products in user cart
+if (isset($_SESSION['email'])) {
+    $arr = explode("@", $_SESSION['email'], 2); 
+    $cartName = $arr[0] . '_cart';
+
+    $allUserCartProductss = $db_conn -> prepare("SELECT * FROM $cartName");
+    $allUserCartProductss -> execute();
+
+    $totalCartProducts = $allUserCartProductss -> rowCount();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -124,9 +137,19 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
                 </div>
                 <div class="menu-cart">
                     <div class="cart-count">
-                        <p>0</p>
+                        <p>
+                            <?php echo $totalCartProducts; ?>
+                        </p>
                     </div>
-                    <p>Cart</p>
+                    <p>
+                        <?php
+                            if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
+                                echo '<a href="cart.php">Cart</a>';
+                            } else {
+                                echo 'Cart';
+                            }
+                        ?>
+                    </p>
                 </div>
             </div>
         </nav>

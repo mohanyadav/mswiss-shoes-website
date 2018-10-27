@@ -24,7 +24,7 @@
         echo "Please enter password!";
     } elseif ($user_row['user_email'] == $email && $password_verified) {
         echo "products.php";
-        $token = $email + $password + time();
+        $token = $password + time();
         $token = password_hash($token, PASSWORD_BCRYPT);
 
         $sql = "UPDATE users SET user_token = '$token' WHERE user_email = '$email'";

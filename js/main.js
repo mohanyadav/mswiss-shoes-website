@@ -67,12 +67,36 @@ $(document).ready(function(){
             $('.cart-count p').text($count);
 
             // Add product to database cart
+
+            var data = "product_name=" + $("h4").text();
+
+            $.ajax({
+                type: "POST",
+                url: "includes/add-to-cart.php",
+                data: data,
+                success: function(data)
+                {                       
+                }
+            });
             
+        e.preventDefault();
         } else {
             $count--;
             $('.cart-count p').text($count);
 
             //Remove product from database cart
+            var data = "product_name=" + $("h4").text();
+
+            $.ajax({
+                type: "POST",
+                url: "includes/remove-from-cart.php",
+                data: data,
+                success: function(data)
+                {                       
+                }
+            });
+            
+        e.preventDefault();
         }
 
         

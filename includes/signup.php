@@ -32,7 +32,7 @@
         echo "You are already a registered user!";
     } else {
         # Generate a unique token
-        $token = $email + $password + time();
+        $token = $password + time();
         $token = password_hash($token, PASSWORD_BCRYPT);
 
         $insertStmt = $db_conn->prepare("INSERT INTO users (user_name, user_email, user_password, user_address, user_type, user_token) VALUES (:name, :email, :password, :address, :type, :token);");

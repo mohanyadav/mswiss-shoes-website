@@ -216,7 +216,7 @@ owl-carousel .owl-item img {
 }
 
 .added::after {
- content: 'Added';
+ content: 'Remove from cart';
 }
 
 .added {

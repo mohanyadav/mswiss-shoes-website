@@ -54,6 +54,27 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
     }
 
 }
+
+$totalCartProducts = 0;
+
+if (isset($_SESSION['email'])) {
+    // Check if product is in user cart
+    $arr = explode("@", $_SESSION['email'], 2); 
+    $cartName = $arr[0] . '_cart';
+
+    $productInCartID = $product['product_id'];
+    $checkCart = $db_conn -> prepare("SELECT * FROM $cartName WHERE product_id = $productInCartID");
+
+    $checkCart -> execute();
+    $checkCartProduct = $checkCart -> fetch(PDO::FETCH_ASSOC);
+
+    $allUserCartProductss = $db_conn -> prepare("SELECT * FROM $cartName");
+    $allUserCartProductss -> execute();
+
+    $totalCartProducts = $allUserCartProductss -> rowCount();
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -170,9 +191,18 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
                 </div>
                 <div class="menu-cart">
                     <div class="cart-count">
-                        <p>0</p>
+                        <p><?php echo $totalCartProducts; ?></p>
                     </div>
-                    <p>Cart</p>
+                    <p>
+                        <?php
+
+                        if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
+                            echo '<a href="cart.php">Cart</a>';
+                        } else {
+                            echo 'Cart';
+                        }
+                        ?>
+                    </p>
                 </div>
             </div>
         </nav>
@@ -200,15 +230,21 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
                     <p><?php echo $product['product_description']; ?></p>
                     <?php
                     if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
-                        if ($email == $_server_email && $token == $_server_token)
+                        if ($email == $_server_email && $token == $_server_token && $checkCartProduct > 0)
                         {
+                            // Show remove from cart button
+                            echo '
+                            <a class="add-to-cart added"><span></span></a>
+                            ';
+                        } else {
+
+                            // Show add to cart button 
                             echo '
                             <a class="add-to-cart"><span></span></a>
                             ';
-                        } else {
-                            echo '<button class="product-detail-add-to-cart"><span>+</span>Add to cart</button>';
                         }          
                     } else {
+                        // Show add to cart button which redirects to login
                         echo '<button class="product-detail-add-to-cart"><span>+</span>Add to cart</button>';
                     }
                     ?>

@@ -25,13 +25,18 @@ nav {
 
 .menu-icon,
 .menu-aria,
-.menu-cart,
 .menu-login-signup,
-.menu-container p,
-.cart-count,
 .menu-text {
     display: inline;
     cursor: pointer;
+    color: #ffffff;
+}
+
+.menu-cart,
+.cart-count,
+.menu-container p
+ {
+    display: inline;
     color: #ffffff;
 }
 
@@ -70,6 +75,7 @@ nav {
 
 .menu-cart {
     float: right;
+    cursor: default;
 }
 
 .cart-count p {
@@ -82,6 +88,12 @@ nav {
 
 .menu-cart p {
     margin-left: 10px;
+}
+
+.menu-cart p a {
+    text-decoration: none;
+    color: #000000;
+    margin-left: 0px;
 }
 
 .menu-login-signup {

@@ -32,6 +32,16 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
 
 }
 
+if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
+    if ($email == $_server_email && $token == $_server_token)
+    {
+
+    }
+} else {
+    header('Location: index.php');
+}
+
+
 $totalCartProducts = 0;
 
 if (isset($_SESSION['email'])) {
@@ -52,7 +62,7 @@ if (isset($_SESSION['email'])) {
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>MSwiss | Products</title>
+    <title>Your Cart | MSwiss</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Main CSS-->
@@ -153,15 +163,7 @@ if (isset($_SESSION['email'])) {
                             <?php echo $totalCartProducts; ?>
                         </p>
                     </div>
-                    <p>
-                        <?php
-                            if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
-                                echo '<a href="cart.php">Cart</a>';
-                            } else {
-                                echo 'Cart';
-                            }
-                        ?>
-                    </p>
+                    <p>Cart</p>
                 </div>
             </div>
         </nav>
