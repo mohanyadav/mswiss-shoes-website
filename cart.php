@@ -51,28 +51,37 @@ if (isset($_SESSION['email'])) {
     $arr = explode("@", $_SESSION['email'], 2); 
     $cartName = $arr[0] . '_cart';
 
-    $allUserCartProductss = $db_conn -> prepare("SELECT * FROM $cartName");
-    $allUserCartProductss -> execute();
+    $allUserCartProducts = $db_conn -> prepare("SELECT * FROM $cartName");
+    $allUserCartProducts -> execute();
 
-    $totalCartProducts = $allUserCartProductss -> rowCount();
+    $totalCartProducts = $allUserCartProducts -> rowCount();
+
+    #Total Quantity of products
+    $stmtTotalProductQuantity = $db_conn -> prepare("SELECT SUM(product_quantity) FROM $cartName");
+    $stmtTotalProductQuantity -> execute();
+
+    $stmtTotalProductQuantityRow = $stmtTotalProductQuantity -> fetch(PDO::FETCH_NUM);
+
+    $totalProducts = $stmtTotalProductQuantityRow[0];
+
+    #Total Price of Products
+    $totalPriceProducts = $db_conn -> prepare("SELECT SUM(product_total) FROM $cartName");
+
+    $totalPriceProducts -> execute();
+
+    $totalPriceRow = $totalPriceProducts -> fetch(PDO::FETCH_NUM);
+
+    $totalPrice = $totalPriceRow[0];
+
+
+    # Get all products added to cart
+    $allCartProducts = $db_conn -> prepare("SELECT * FROM $cartName");
+    $allCartProducts -> execute();
+
+    $allCartProductsRow = $allCartProducts -> fetchAll();
+
 }
 
-
-#Total Price of Products
-$totalPriceProducts = $db_conn -> prepare("SELECT SUM(product_price) FROM $cartName");
-
-$totalPriceProducts -> execute();
-
-$totalPriceRow = $totalPriceProducts -> fetch(PDO::FETCH_NUM);
-
-$totalPrice = $totalPriceRow[0];
-
-
-# Get all products added to cart
-$allCartProducts = $db_conn -> prepare("SELECT * FROM $cartName");
-$allCartProducts -> execute();
-
-$allCartProductsRow = $allCartProducts -> fetchAll();
 
 ?>
 
@@ -201,9 +210,26 @@ $allCartProductsRow = $allCartProducts -> fetchAll();
                 <div class="cart-products">
                     <?php
                         $cartProductsCount = $allCartProducts ->  rowCount();
-                        
+
                         for ($i=0; $i < $cartProductsCount; $i++) { 
-                            # Print the products
+                            $cartProductQuantitySelected = '';
+
+                            for ($j=1; $j <= 4; $j++) { 
+                                # Loop through all the quantity of the cart product
+                                if ($allCartProductsRow[$i]['product_quantity'] == $j) {
+                                    # Print normal select option
+                                    $cartProductQuantitySelected .= '
+                                    <option selected="selected" value="' . $j . '">' . $j . '</option>
+                                    ';
+                                } else {
+                                    # Print normal select option
+                                    $cartProductQuantitySelected .= '
+                                    <option value="' . $j . '">' . $j . '</option>
+                                    ';
+                                }
+                            }
+
+                            # Display the products
                             echo '
                             <div class="product">
                                 <div class="product-image-wrapper">
@@ -213,6 +239,9 @@ $allCartProductsRow = $allCartProducts -> fetchAll();
                                     <div class="content">
                                         <h4>' . $allCartProductsRow[$i]['product_name'] . '</h4>
                                         <p>$' . $allCartProductsRow[$i]['product_price'] . '</p>
+                                        <select name="' . $allCartProductsRow[$i]['product_name'] . '" class="number_of_products">
+                                        ' . $cartProductQuantitySelected . '
+                                        </select>
                                         <img src="images/icons/icon_close.png" alt="' . $allCartProductsRow[$i]['product_name'] . '" class="remove_product">
                                     </div>
                                 </div>
@@ -224,11 +253,11 @@ $allCartProductsRow = $allCartProducts -> fetchAll();
                 </div>
             </div>
             <div class="checkout-wrapper">
-                <p>Total Items: <span><?php echo $totalCartProducts; ?></span></p>
+                <p>Total Items: <span><?php echo $totalProducts; ?></span></p>
                 <p>Products Price: 
                     <span>
                         <?php 
-                            $totalPrice = number_format($totalPrice, 2, '.', ' ');
+                            $totalPrice = number_format((float)$totalPrice, 2, '.', '');
                             echo '$'.$totalPrice;
                         ?>
                     </span>
@@ -237,7 +266,7 @@ $allCartProductsRow = $allCartProducts -> fetchAll();
                     <span>
                     <?php 
                         $gst = $totalPrice * 18 / 100;
-                        $gst = number_format($gst, 2, '.', ' ');
+                        $gst = number_format((float)$gst, 2, '.', '');
                         echo '$'.$gst; 
                     ?>
                     </span>
@@ -247,7 +276,7 @@ $allCartProductsRow = $allCartProducts -> fetchAll();
                     <?php 
                         $priceDiff = $totalPrice + $gst - round($totalPrice + $gst);
 
-                        $priceDiff = number_format($priceDiff, 2, '.', ' ');
+                        $priceDiff = number_format((float)$priceDiff, 2, '.', '');
                         echo '$'.$priceDiff; 
                     ?>
                     </span>
@@ -259,7 +288,7 @@ $allCartProductsRow = $allCartProducts -> fetchAll();
                         <?php 
                             $totalPriceAfterGST = $totalPrice + $gst - $priceDiff;
 
-                            $totalPriceAfterGST = number_format($totalPriceAfterGST, 2, '.', ' ');
+                            $totalPriceAfterGST = number_format((float)$totalPriceAfterGST, 2, '.', '');
                             echo '<sup>$ </sup>'.$totalPriceAfterGST; 
                         ?>
                     </span>

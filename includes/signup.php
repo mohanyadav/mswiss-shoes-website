@@ -54,7 +54,8 @@
         product_name VARCHAR(60) NOT NULL,
         product_price FLOAT(50) NOT NULL,
         product_image VARCHAR(255) NOT NULL,
-        product_quantity INT(20) NOT NULL
+        product_quantity INT(20) NOT NULL,
+        product_total FLOAT(50) NOT NULL
         );";
 
         $db_conn -> exec($createTableSql);

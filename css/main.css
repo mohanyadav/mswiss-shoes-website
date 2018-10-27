@@ -405,7 +405,7 @@ nav {
     font-size: 40px;
     margin-bottom: 0px;
     margin: 0;
-    margin-top: 30px;
+    margin-top: 10px;
 }
 
 .product-content-wrapper .content p {
@@ -425,6 +425,19 @@ nav {
     top: 50%;
     transform: translateX(-50%);
     cursor: pointer;
+}
+
+.product-content-wrapper .content .number_of_products {
+    height: 30px;
+    width: 100px;
+    border-radius: 2px;
+    padding-left: 10px;
+    margin-top: 8px;
+
+    /* Removes the default <select> styling */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .checkout-wrapper {

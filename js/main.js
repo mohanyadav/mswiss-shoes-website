@@ -118,6 +118,25 @@ $(document).ready(function(){
         });
     });
 
+    // Handle change in product quantity
+    $(".number_of_products").change(function(e){
+        e.preventDefault();
+        var productName = $(this).attr('name');
+        var quantitySelected = $(this).children('option:selected').val();
+        
+        var data = "product_name=" + productName + "&product_quantity=" + quantitySelected;
+
+        $.ajax({
+            type: "POST",
+            url: "includes/functions.php",
+            data: data,
+            success: function(data)
+            {       
+                window.location.reload();                
+            }
+        });
+    });
+
     navSignupBtn.click(function(e){
         e.preventDefault();
         overlay.addClass('active');

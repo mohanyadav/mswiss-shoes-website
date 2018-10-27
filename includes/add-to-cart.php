@@ -29,7 +29,7 @@ if ($product_row > 0) {
     } else {
         # add product to cart
         echo "not exist";
-        $stmtAdd = $db_conn -> prepare("INSERT INTO $cartName (product_id, product_name, product_price, product_image, product_quantity) VALUES (:product_id, :product_name, :product_price, :product_image, :product_quantity);");
+        $stmtAdd = $db_conn -> prepare("INSERT INTO $cartName (product_id, product_name, product_price, product_image, product_quantity, product_total) VALUES (:product_id, :product_name, :product_price, :product_image, :product_quantity, :product_total);");
 
         $quantity = '1';
         $stmtAdd -> bindParam(':product_id', $product_row['product_id']);
@@ -37,6 +37,7 @@ if ($product_row > 0) {
         $stmtAdd -> bindParam(':product_price', $product_row['product_price']);
         $stmtAdd -> bindParam(':product_image', $product_row['product_image_1']);
         $stmtAdd -> bindParam(':product_quantity', $quantity);
+        $stmtAdd -> bindParam(':product_total', $product_row['product_price']);
         
         $stmtAdd -> execute();
 
