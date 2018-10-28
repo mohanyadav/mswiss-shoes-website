@@ -357,7 +357,8 @@ nav {
     box-sizing: border-box;
 }
 
-.cart-wrapper h2 {
+.cart-wrapper h2,
+.address-wrapper h2 {
     font-family: 'Roboto' , sans-serif;
     font-weight: 500;
     font-size: 30px;
@@ -497,4 +498,56 @@ nav {
 .checkout-wrapper .total-price span {
     color: #15b344;
 
+}
+
+/* Shipping Styles */
+.address-wrapper .status {
+    color: #b32d15;
+    font-family: 'Roboto', sans-serif;
+    opacity: 0;
+}
+
+.address-wrapper input[type='text'] {
+    width: 100%;
+    height: auto;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+    margin-bottom: 10px;
+    border-radius: 3px;
+    border: 1px solid #cecece;
+    outline: 0;
+    box-sizing: border-box;
+}
+
+.address-wrapper input[type='text']::placeholder {
+    color: #bebebe;
+}
+
+.address-wrapper .address_half_input {
+    width: 49% !important;
+    float: left;
+}
+
+.address-wrapper .address_half_input.margin-right {
+    margin-right: 2%;
+}
+
+#address-form input[type='submit'] {
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    text-transform: capitalize;
+    color: #ffffff;
+    padding: 12px 40px;
+    background: #d4b838;
+    border-radius: 5px;
+    display: inline-block;
+    margin-top: 10px;
+    transition: all 0.3s;
+}
+
+#address-form input[type='submit']:hover {
+    background: #b3971c;
+    transition: all 0.3s;
 }

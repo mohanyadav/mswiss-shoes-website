@@ -12,6 +12,15 @@ if (isset($_POST['product_name']) && isset($_POST['product_quantity'])) {
     cartQuantityUpdate($product_name, $product_quantity, $db_conn);
 }
 
+if (isset($_POST['address'])
+    && isset($_POST['city'])
+    && isset($_POST['state'])
+    && isset($_POST['landmark'])
+    && isset($_POST['pincode'])) {
+
+        
+}
+
 
 # Functions
 

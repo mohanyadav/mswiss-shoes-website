@@ -4,12 +4,7 @@ session_start();
 
 include_once('includes/config.php');
 
-$getProducts = $db_conn -> prepare("SELECT * FROM products");
-$getProducts -> execute();
-
-$products = $getProducts -> fetchAll();
-
-#Auth Section
+#Check if the user has items in cart and is logged in
 if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
 
     #Store retrieved session values
@@ -30,19 +25,26 @@ if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
         $_server_token = $user_row['user_token'];
     }
 
-}
+    if ($email == $_server_email && $token == $_server_token)
+    {
+        $arr = explode("@", $_SESSION['email'], 2); 
+        $cartName = $arr[0] . '_cart';
 
-$totalCartProducts = 0;
+        $getCartProducts = $db_conn -> prepare("SELECT * FROM $cartName");
+        $getCartProducts -> execute();
 
-if (isset($_SESSION['email'])) {
-    // Check if product is in user cart
-    $arr = explode("@", $_SESSION['email'], 2); 
-    $cartName = $arr[0] . '_cart';
+        $cartProducts = $getCartProducts -> fetchAll();
+        $totalCartProducts = $getCartProducts -> rowCount();
+    }
 
-    $allUserCartProductss = $db_conn -> prepare("SELECT * FROM $cartName");
-    $allUserCartProductss -> execute();
+    if ($totalCartProducts > 0 ) {
+        
+    } else {
+        header('Location: products');
+    }
 
-    $totalCartProducts = $allUserCartProductss -> rowCount();
+} else {
+    header('Location: index');
 }
 
 ?>
@@ -52,18 +54,21 @@ if (isset($_SESSION['email'])) {
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>MSwiss | Products</title>
+    <title>Shipping | MSwiss</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="images/icons/favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="images/icons/favicon-128.png" sizes="128x128" />
-    
+
     <!-- Main CSS-->
     <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
 
     <!-- Products CSS -->
     <link rel="stylesheet" type="text/css" media="screen" href="css/products.css" />
+
+    <!-- Roboto font CDN -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
 
 </head>
 <body>
@@ -76,12 +81,12 @@ if (isset($_SESSION['email'])) {
                 </a>
             </li>
             <li>
-                <a href="products.php" class="active-link">
+                <a href="products.php">
                     Shop
                 </a>
             </li>
             <li>
-                <a href="cart.php">
+                <a href="cart.php" class="active-link">
                     Cart
                 </a>
             </li>
@@ -162,101 +167,24 @@ if (isset($_SESSION['email'])) {
                             <?php echo $totalCartProducts; ?>
                         </p>
                     </div>
-                    <p>
-                        <?php
-                            if (isset($_SESSION['email']) && isset($_SESSION['token'])) {
-                                echo '<a href="cart.php">Cart</a>';
-                            } else {
-                                echo 'Cart';
-                            }
-                        ?>
-                    </p>
+                    <p>Cart</p>
                 </div>
             </div>
         </nav>
 
         <div class="products-container">
-            <?php 
-                $rows = $getProducts -> rowCount();
-                    // $count = 0;
-                    if ($rows > 0) {
-                        for ($i=0; $i < $rows; $i++) {
-                            // if ($i % 3 == 2 || $i == 0) {
-                            //     echo '<div class="products-row">';
-                            //     $count = $i;
-                            //     // echo 'i starting ' . $i . '<br>';
-                            // }
-                            
-                            // $product_url = strtolower(Str_replace(' ', '-', $products[$i]['product_name']));
-                            
-                            echo '
-                            <a href="product-detail.php?' . $products[$i]['product_url'] . '" class="product-card">
-                                <img src="' . $products[$i]['product_image_1'] . '" alt="'. $products[$i]['product_name'] . '" />
-                                <div class="product-title">
-                                    <h4>' . $products[$i]['product_name'] . '</h4>
-                                    <p>$' . $products[$i]['product_price'] . '</p>
-                                </div>
-                            </a>';
-    
-                            // if ($i % 3 == 1 && $i != 0) {
-                            //     // echo 'i ending ' . $i . '<br>';
-                            //     echo '</div>
-                            //     <div class="clearfix"></div>';
-                            // }
-                        }
-                    }
-    
-            ?>
-            <!-- <div class="products-row">
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
+            <div class="address-wrapper">
+                <h2>Shipping Address</h2>
+                <p class="status">Fill City</p>
+                <form id="address-form">
+                    <input type="text" placeholder="Address" id="shipping-address" required>
+                    <input type="text" placeholder="City" id="shipping-city" class="address_half_input margin-right" required>
+                    <input type="text" placeholder="State" id="shipping-state" class="address_half_input" required>
+                    <input type="text" placeholder="Landmark" id="shipping-landmark" class="address_half_input margin-right" required>
+                    <input type="text" placeholder="Pincode" id="shipping-pincode" class="address_half_input" required>
+                    <input type="submit" value="Go to Payment">
+                </form>
             </div>
-
-            <div class="clearfix"></div>
-            <div class="products-row">
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-                <a href="images/home_hero1.jpg" class="product-card">
-                    <img src="images/product_images/product1.png" alt="Product 1" />
-                    <div class="product-title">
-                        <h4>Nike VaporMax</h4>
-                        <p>$200</p>
-                    </div>
-                </a>
-            </div>
-            <div class="clearfix"></div> -->
-
         </div>
     </div>
 

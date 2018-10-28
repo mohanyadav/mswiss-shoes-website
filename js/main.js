@@ -72,7 +72,7 @@ $(document).ready(function(){
 
             $.ajax({
                 type: "POST",
-                url: "includes/add-to-cart.php",
+                url: "includes/add-to-cart",
                 data: data,
                 success: function(data)
                 {                       
@@ -89,7 +89,7 @@ $(document).ready(function(){
 
             $.ajax({
                 type: "POST",
-                url: "includes/remove-from-cart.php",
+                url: "includes/remove-from-cart",
                 data: data,
                 success: function(data)
                 {                       
@@ -109,7 +109,7 @@ $(document).ready(function(){
 
         $.ajax({
             type: "POST",
-            url: "includes/remove-from-cart.php",
+            url: "includes/remove-from-cart",
             data: data,
             success: function(data)
             {       
@@ -128,7 +128,7 @@ $(document).ready(function(){
 
         $.ajax({
             type: "POST",
-            url: "includes/functions.php",
+            url: "includes/functions",
             data: data,
             success: function(data)
             {       
@@ -154,7 +154,7 @@ $(document).ready(function(){
 
         $.ajax({
                type: "POST",
-               url: "includes/signup.php",
+               url: "includes/signup",
                data: data,
                success: function(data)
                {
@@ -178,7 +178,7 @@ $(document).ready(function(){
 
         $.ajax({
                type: "POST",
-               url: "includes/login.php",
+               url: "includes/login",
                data: data,
                success: function(data)
                {
@@ -193,4 +193,37 @@ $(document).ready(function(){
     
         e.preventDefault();
     });
+
+    // Submit Shipping info
+    $('#address-form').submit(function(e){
+
+        var address = $('#shipping-address').val();
+        var city = $('#shipping-city').val();
+        var state = $('#shipping-state').val();
+        var landmark = $('#shipping-landmark').val();
+        var pincode = $('#shipping-pincode').val();
+
+        var data = "address=" + address + "&city=" + city + "&state=" + state + "&landmark=" + landmark + "&pincode=" + pincode;
+
+        alert(data);
+
+        $.ajax({
+            type: "POST",
+            url: "includes/functions",
+            data: data,
+            success: function(data)
+            {
+                alert(data);
+                if(data == "products.php")
+                {
+                     window.location.href = data;
+                } else {
+                    loginStatusText.html(data);
+                }
+             }
+          });
+
+        e.preventDefault();
+    });
+
 });

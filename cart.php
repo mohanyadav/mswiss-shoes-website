@@ -93,6 +93,10 @@ if (isset($_SESSION['email'])) {
     <title>Your Cart | MSwiss</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="images/icons/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="images/icons/favicon-128.png" sizes="128x128" />
+
     <!-- Main CSS-->
     <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
 
@@ -297,7 +301,8 @@ if (isset($_SESSION['email'])) {
                     if ($totalCartProducts > 0) {
                         # Show Checkout button only if user cart has product
                         echo '
-                            <a href="#" class="checkout-button">Checkout</a>
+                            <a href="shipping.php" class="checkout-button">         Checkout
+                            </a>
                         ';
                     }
                 ?>

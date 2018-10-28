@@ -85,6 +85,10 @@ if (isset($_SESSION['email'])) {
     <title>MSwiss | <?php echo $product['product_name'] ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="images/icons/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="images/icons/favicon-128.png" sizes="128x128" />
+    
     <!-- Main CSS-->
     <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
 
